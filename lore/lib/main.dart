@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_youtube/flutter_youtube.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:youtube_player/youtube_player.dart';
+import 'package:lore/sl.dart';
+import 'about.dart';
 import 'conductor.dart';
 import 'game.dart';
 void main() => runApp(MyApp());
+
 String short_title = 'Lore';
 String long_title = 'LOVE-LITerary';
-// Future<SharedPreferences> prefs =  SharedPreferences.getInstance();
 class MyApp extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,13 @@ class StartMenu extends StatelessWidget{
         children: <Widget>[
           Container(
             color: bg,
-            padding: EdgeInsets.all(MediaQuery.of(context).size.height * 0.1),),
+            padding: EdgeInsets.all(MediaQuery.of(context).size.height * 0.04),
+            child: ClipRRect( 
+        
+        borderRadius: BorderRadius.circular(90),
+        child:Image.asset('assets/logo.jpg' ,)
+
+        ),),
           RaisedButton(
               child:Text(' '*6+'New Game'+' '*6),
               shape: roundbutton(), 
@@ -37,7 +43,7 @@ class StartMenu extends StatelessWidget{
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Game(s_title: short_title,l_title: long_title,n: 1,)),
+                    builder: (context) => Game(s_title: short_title,l_title: long_title,n: "cover",)),
                        );
               },
               color: bgbutton ,
@@ -47,39 +53,39 @@ class StartMenu extends StatelessWidget{
               child:Text(' '*6+'Load Game'+' '*6),
               shape: roundbutton(), 
               onPressed: () {
-                int n = 0;
-                if(n==0){
-                    Fluttertoast.showToast(
-                            msg: "ยังไม่เสร็จ",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIos: 1,
-                            backgroundColor: bgbutton,
-                            textColor: Colors.black, 
-                            // fontSize: 16.0
-                        );
+                readD().then((param) {
+                if(param==null){
+                  
+                  Fluttertoast.showToast(
+                msg: "ไม่พบ save",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIos: 1,
+                backgroundColor: bgbutton,
+                textColor: Colors.black, 
+                // fontSize: 16.0 
+                );
                 }else{
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Game(s_title: short_title,l_title: long_title, n: param,)),
+                       );
                 }
+                }) ;
                 
 
               },
               color: bgbutton ,
               ),
-          // RaisedButton(
-          //     child:Text('9'* 25 ),
-          //     shape: roundbutton(), onPressed: () {},) ,
+          
           Row(mainAxisAlignment: MainAxisAlignment.center
             ,children : <Widget>[
           RaisedButton  (
                 child:Text('Conductor'),
                 shape: roundbutton(), 
-                onPressed: () {},
-                color: bgbutton ,
-                ),
-          Text(' '),
-          FloatingActionButton( child: Icon(Icons.priority_high,color: Colors.black,), 
-                  onPressed: () {
-                    Navigator.push(
+                onPressed: () {
+                         Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context){
@@ -88,8 +94,21 @@ class StartMenu extends StatelessWidget{
                       ,);
                     }),
                        );
-
-                  },
+                },
+                color: bgbutton ,
+                ),
+          Text(' '),
+          FloatingActionButton( 
+                  child: Icon(Icons.priority_high,color: Colors.black,), 
+                  onPressed: (){
+                  FlutterYoutube.playYoutubeVideoById(
+                          apiKey: "AIzaSyA3MqOoJ6Ml_aPsZ6qtv6UWf34Va-RkAhc",
+                          // apiKey: "<API_KEY>",
+                          videoId: "AHpcw4aOtgs",
+                          autoPlay: true,
+                        ) ;
+                  }
+                  ,
                   backgroundColor: Colors.grey[350],
                   mini: true,
                   ) 
@@ -99,7 +118,12 @@ class StartMenu extends StatelessWidget{
           RaisedButton(
               child: Text(' '*11+'About'+' '*11),
               shape: roundbutton(), 
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context, 
+                MaterialPageRoute(
+                  builder: (context)=>AutoScrollPage()
+                  )
+                );              },
               color: bgbutton ,
               ),
           ],
@@ -112,6 +136,5 @@ RoundedRectangleBorder roundbutton(){
   return RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(18.0),
             side: BorderSide(color: Colors.green,width: 2)
-            // side: BorderSide(color: Colors.red)
 );
 }

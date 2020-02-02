@@ -1,17 +1,23 @@
+// import 'package:easy_alert/easy_alert.dart';
+// import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:url_launcher/url_launcher.dart';
+import 'main.dart';
+import 'sl.dart';
 class Game extends StatelessWidget {
   Game({Key key, this.s_title,this.l_title,this.n}) : super(key: key);
   final String s_title;
   final String l_title;
-  final int n;
+  final String n;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: this.s_title,
-      home: MyHomePage(title: this.l_title,n:this.n),
+      home: MyHomePage(title: this.l_title, n : this.n),
     );
   }
 }
@@ -19,39 +25,58 @@ class Game extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title,this.n}) : super(key: key);
   final String title;
-   int n;
+  String n;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // int n = widget.n;
+  // String n = ;
   
-
+  
 
   @override
   Widget build(BuildContext context) {
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.greenAccent[400],
+            backgroundColor: Colors.green[600],
             title: Text(widget.title),
-            actions: <Widget>[
-              IconButton(icon: Icon( Icons.save) ,onPressed: (){setState(() {
-                SharedPreferences prefs = SharedPreferences.getInstance() as SharedPreferences;
-                prefs.setInt('n', widget.n);
-                // SharedPreferences prefs = await SharedPreferences.getInstance();
-                this.widget.n = 1;
-              });})
+            actions: <Widget>[IconButton(icon: Icon(Icons.home),onPressed: (){
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyApp(),
+                       ) );
+            },),
+              IconButton(icon: Icon( Icons.save) ,
+              onPressed: 
+              (){setState(() {
+
+                saveD(this.widget.n);
+                
+                             Fluttertoast.showToast(
+                            msg: "Save at "+this.widget.n+" Already",
+                            toastLength: Toast.LENGTH_LONG,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIos: 1,
+                            backgroundColor: Colors.greenAccent,
+                            textColor: Colors.black, 
+                            // fontSize: 16.0
+                        );
+              });}
+              )
             ],
           ),
+          backgroundColor: Colors.greenAccent[100],
           body: next(widget.n),
         
       );
   }
-  Widget next(int n){
+  Widget next(n){
   var dic = {
-      // 'a':['b'],'b':[1],
+      "cover":['a'],
+      'a':['b'],'b':[1],
       1:[5,9], 2:[10,28],3:[16,12],4:[40,17,13],5:[8,11],6:[61],7:[3,27],8:[19,11],9:[4,7],10:[28,32],11:[14,2],12:[15,18]
       ,13:[62],14:[7,2],15:[38,4],16:[62],17:[2,24],18:[25,21],19:[23,7],20:[26,24],21:[36,25],22:[44],23:[20,7],24:[43,61],25:[15,24]
       ,26:[13,33],27:[16,24],28:[35,46],29:[61],30:[58,53],31:[63],32:[28,58],33:[62],34:[55,6],35:[51,37],36:[62],37:[53,30],38:[42,45]
@@ -60,7 +85,15 @@ class _MyHomePageState extends State<MyHomePage> {
       };
   var ending = {61:6199,62:6299,63:6399};
   String nn = '$n';
-  if(n<10){nn = '0$n';}
+  var d = dic[n];
+  if(d==null){
+    
+    d=dic[int.parse(n)];
+    if(int.parse(n)<10){
+      nn="0"+n;
+    }
+  
+  }
   return ListView(
     children: <Widget>[
       Container(
@@ -68,12 +101,13 @@ class _MyHomePageState extends State<MyHomePage> {
        child : Image.asset('assets/'+nn+'00.jpg')
        )
        , 
-    ]+ anwser(dic[n],nn),
+    ]+ anwser(d,nn),
     
   );
   }
  BoxDecoration anwserDec() {
   return BoxDecoration(
+    borderRadius:BorderRadius.all(Radius.circular(13.0)),
     border: Border(
       left: BorderSide( //                   <--- left side
         color: Colors.black,
@@ -92,24 +126,36 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Widget> anwser(List x,String n) {
   List<Widget> list = new List();
   int t = 1;
-  for(int i in x){
+  for(int i=0;i<x.length;i++){
     list.add(
       FractionallySizedBox(
+        
         widthFactor: 0.725,
         // heightFactor: 0.1,
       child: Container(
-      decoration: anwserDec(),
+      // color: Colors.greenAccent,
+      // decoration: anwserDec(),
       child: FlatButton(colorBrightness: Brightness.dark,
-      child:Image.asset('assets/'+n+'0$t'+'.jpg',), onPressed: () { 
+      // shape: roundbutton(),
+      child:
+      ClipRRect( 
+        
+        borderRadius: BorderRadius.circular(8.5),
+        child:Image.asset('assets/'+n+'0$t'+'.jpg',)
+
+        )
+        , onPressed: () { 
         // Future.delayed(Duration(seconds: 10));
         setState(() {
-        this.widget.n = i;  }); 
+        var ii = x[i];
+        this.widget.n = "$ii";  }); 
         },
       ) 
       )
    , 
       )
     );
+    list.add(Text(''));
     t+=1;
   }
   if(list.length == 0){
@@ -117,7 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
       Image.asset('assets/'+'$n'+'99.jpg')
       ,
       IconButton(icon: Icon(Icons.autorenew),onPressed:(){setState(() {
-      this.widget.n  = 1;
+      this.widget.n  = 'cover';
     });},) ,
     Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -167,3 +213,11 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 }
 
+RoundedRectangleBorder roundbutton(){
+  return RoundedRectangleBorder(
+            borderRadius: new BorderRadius.circular(18.0),
+            side: BorderSide(color: Colors.green,width: 2)
+            
+            // side: BorderSide(color: Colors.red)
+);
+}

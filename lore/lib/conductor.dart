@@ -1,20 +1,32 @@
-// import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
-import 'package:youtube_player/youtube_player.dart';
+
+import 'main.dart';
 
 class Conductor extends StatelessWidget{
   Widget build(BuildContext context){
-    return Scaffold(body: Center(
-                        child: YoutubePlayer(
-                                  context: context,
-                                  source: "AHpcw4aOtgs",
-                                  quality: YoutubeQuality.HIGH,
-                                  isLive: true,
-                                  //  quality: null, 
-                                  // callbackController: (controller) {
-                                  // _videoController = controller;
-                                  // quality: null,
-                          ),
-                      ),);
+    return Scaffold(
+      appBar: AppBar(
+            backgroundColor: Colors.green[600],
+            title: Text("Character"),
+            actions: <Widget>[IconButton(icon: Icon(Icons.home),onPressed: (){
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyApp(),
+                       ) );
+            },),
+             
+            ],
+          ),
+          backgroundColor: Colors.greenAccent[100],
+          body: ListView.builder(
+            itemCount: 7,
+            itemBuilder: (BuildContext context,int index){
+              index = index+1;
+              return Image.asset("assets/c$index"+".jpg");
+            },
+          ),
+    );
   }
 }
